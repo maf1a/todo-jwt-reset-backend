@@ -1,9 +1,9 @@
 package initializers
 
 import (
+	"os"
+	"strconv"
 	"time"
-
-	"github.com/spf13/viper"
 )
 
 type Config struct {
@@ -28,17 +28,50 @@ type Config struct {
 }
 
 func LoadConfig(path string) (config Config, err error) {
-	viper.AddConfigPath(path)
-	viper.SetConfigType("env")
-	viper.SetConfigName("app")
+	// err1 := godotenv.Load()
+	// if err1 != nil {
+	// 	DBHost1, _ := os.LookupEnv("MYSQL_HOST")
+	// 	log.Fatal("Error loading .env file", DBHost1)
+	// }
 
-	viper.AutomaticEnv()
+	DBHost, _ := os.LookupEnv("MYSQL_HOST")
+	DBUserName, _ := os.LookupEnv("MYSQL_USER")
+	DBUserPassword, _ := os.LookupEnv("MYSQL_PASSWORD")
+	DBName, _ := os.LookupEnv("MYSQL_DATABASE")
+	DBPort, _ := os.LookupEnv("MYSQL_PORT")
+	ServerPort, _ := os.LookupEnv("PORT")
+	ClientOrigin, _ := os.LookupEnv("CLIENT_ORIGIN")
+	RedisUri, _ := os.LookupEnv("REDIS_URL")
+	AccessTokenPrivateKey, _ := os.LookupEnv("ACCESS_TOKEN_PRIVATE_KEY")
+	AccessTokenPublicKey, _ := os.LookupEnv("ACCESS_TOKEN_PUBLIC_KEY")
+	RefreshTokenPrivateKey, _ := os.LookupEnv("REFRESH_TOKEN_PRIVATE_KEY")
+	RefreshTokenPublicKey, _ := os.LookupEnv("REFRESH_TOKEN_PUBLIC_KEY")
+	AccessTokenExpiresIn_str, _ := os.LookupEnv("ACCESS_TOKEN_EXPIRED_IN")
+	RefreshTokenExpiresIn_str, _ := os.LookupEnv("REFRESH_TOKEN_EXPIRED_IN")
+	AccessTokenMaxAge_str, _ := os.LookupEnv("ACCESS_TOKEN_MAXAGE")
+	RefreshTokenMaxAge_str, _ := os.LookupEnv("REFRESH_TOKEN_MAXAGE")
 
-	err = viper.ReadInConfig()
-	if err != nil {
-		return
-	}
+	AccessTokenExpiresIn, _ := time.ParseDuration(AccessTokenExpiresIn_str)
+	RefreshTokenExpiresIn, _ := time.ParseDuration(RefreshTokenExpiresIn_str)
+	AccessTokenMaxAge, _ := strconv.Atoi(AccessTokenMaxAge_str)
+	RefreshTokenMaxAge, _ := strconv.Atoi(RefreshTokenMaxAge_str)
 
-	err = viper.Unmarshal(&config)
-	return
+	return Config{
+		DBHost,
+		DBUserName,
+		DBUserPassword,
+		DBName,
+		DBPort,
+		ServerPort,
+		ClientOrigin,
+		RedisUri,
+		AccessTokenPrivateKey,
+		AccessTokenPublicKey,
+		RefreshTokenPrivateKey,
+		RefreshTokenPublicKey,
+		AccessTokenExpiresIn,
+		RefreshTokenExpiresIn,
+		AccessTokenMaxAge,
+		RefreshTokenMaxAge,
+	}, nil
 }
